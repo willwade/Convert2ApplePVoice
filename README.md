@@ -5,58 +5,168 @@ A macOS automation tool that facilitates the creation of Apple Personal Voice us
 ## Features
 
 - OCR-based text extraction using Apple's Vision framework
-- Automated UI interaction with Personal Voice interface
-- TTS playback of extracted prompts
-- Fully automated workflow with customizable delays
+- Extensive TTS engine support (local and cloud-based)
+- Works with Personal Voice's Continuous Recording mode
+- Audio routing to system input via virtual audio device
 - Privacy-focused: runs entirely on-device with no external data transmission
+- Configurable OCR region and TTS settings
 
 ## Requirements
 
 - macOS (tested on macOS Sonoma)
 - Python 3.10+
-- Accessibility permissions enabled for script execution
+- Screen Recording permission for OCR functionality
+- BlackHole 2ch or similar virtual audio device
+- For eSpeak support: `brew install espeak-ng`
+- For cloud-based TTS: Valid API credentials
 
 ## Installation
 
-1. Clone this repository:
+1. Install BlackHole for audio routing:
+```bash
+brew install blackhole-2ch
+```
+
+2. Set up audio routing:
+   - Open System Settings > Sound
+   - Under Input, select "BlackHole 2ch"
+   - Under Output, your regular speakers should be selected
+
+3. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/Convert2ApplePVoice.git
 cd Convert2ApplePVoice
 ```
 
-2. Install dependencies using uv:
+4. Create and activate a virtual environment using uv:
 ```bash
 uv venv
 source .venv/bin/activate
-uv pip install -r requirements.txt
 ```
 
-3. Grant necessary permissions:
-   - Open System Settings > Privacy & Security > Accessibility
+5. Install the package in development mode:
+```bash
+uv pip install -e .
+```
+
+6. Grant necessary permissions:
+   - Open System Settings > Privacy & Security > Screen Recording
    - Enable permissions for your terminal application
-   - Enable permissions for System Settings
+
+## Audio Setup
+
+The tool needs to route TTS audio to Personal Voice's input. Here's how to set it up:
+
+1. **Install Virtual Audio Device**:
+   ```bash
+   brew install blackhole-2ch
+   ```
+
+2. **Configure System Audio**:
+   - Open System Settings > Sound
+   - Set Input to "BlackHole 2ch"
+   - Set Output to your regular speakers
+   - In Personal Voice setup, ensure it's using "BlackHole 2ch" as input
+
+3. **Optional: Audio Monitoring**
+   To hear the TTS output while it's being recorded:
+   - Install Audio MIDI Setup (if not already installed)
+   - Create a Multi-Output Device:
+     1. Open Audio MIDI Setup
+     2. Click the + button > Create Multi-Output Device
+     3. Check both your speakers and "BlackHole 2ch"
+     4. Use this as your system output to hear the TTS
 
 ## Usage
 
 1. Open Personal Voice setup in System Settings
-2. Run the automation script:
+2. Enable "Continuous Recording" mode in Personal Voice
+3. Run the automation script:
 ```bash
-python src/main.py
+uv run src/main.py
 ```
 
-3. The script will:
-   - Extract text from the Personal Voice UI
-   - Automate button clicks
-   - Play back the extracted text using TTS
-   - Continue until all prompts are processed
+4. The script will:
+   - Continuously monitor the screen for new phrases
+   - Automatically speak each phrase using the configured TTS engine
+   - Move to the next phrase when speech is detected
+
+Press Ctrl+C to stop the automation.
 
 ## Configuration
 
-Edit `config.py` to adjust:
-- Delay timings
-- OCR settings
-- TTS voice settings
-- UI automation parameters
+The configuration is split into two files in `~/.config/convert2applevoice/`:
+
+### Main Configuration (config.json)
+
+```json
+{
+    "ocr_region_x": 100,
+    "ocr_region_y": 300,
+    "ocr_region_width": 800,
+    "ocr_region_height": 100,
+    "tts_engine": "macos",
+    "tts_voice": null,
+    "tts_rate": 175,
+    "tts_volume": 1.0,
+    "tts_pitch": 1.0,
+    "tts_extra_options": {},
+    "ocr_interval": 0.2,
+    "retry_delay": 0.5
+}
+```
+
+### Credentials Configuration (credentials.json)
+
+```json
+{
+    "aws_key_id": "your_aws_key",
+    "aws_secret_key": "your_aws_secret",
+    "aws_region": "us-east-1",
+    "azure_key": "your_azure_key",
+    "azure_region": "eastus",
+    "watson_api_key": "your_watson_key",
+    "watson_url": "your_watson_url",
+    "elevenlabs_api_key": "your_elevenlabs_key"
+}
+```
+
+## Supported TTS Engines
+
+The tool supports multiple TTS engines through py3-tts-wrapper:
+
+### Local Engines
+- `macos`: Built-in macOS TTS (default)
+- `espeak`: Open-source speech synthesizer
+
+### Cloud-based Engines (requires credentials)
+- `polly`: Amazon AWS Polly
+- `azure`: Microsoft Azure TTS
+- `watson`: IBM Watson TTS
+- `elevenlabs`: ElevenLabs TTS
+
+### Engine Features
+
+| Engine | Online/Offline | SSML | Rate/Volume/Pitch | Word Events |
+|--------|---------------|------|-------------------|-------------|
+| macos | Offline | Yes | Yes | No |
+| espeak | Offline | Yes | Yes | Yes |
+| polly | Online | Yes | Yes | Yes |
+| azure | Online | Yes | Yes | Yes |
+| watson | Online | Yes | No | Yes |
+| elevenlabs | Online | No | Yes | Yes |
+
+### Selecting an Engine
+
+To use a specific engine, set `tts_engine` in your config.json to one of:
+- `"macos"` (default)
+- `"espeak"`
+- `"polly"`
+- `"azure"`
+- `"watson"`
+- `"elevenlabs"`
+
+For cloud-based engines, make sure to add your credentials to credentials.json.
 
 ## Contributing
 
@@ -69,4 +179,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Apple Vision framework for OCR capabilities
-- macOS Accessibility features for UI automation
+- py3-tts-wrapper for TTS engine support
+- Various TTS service providers

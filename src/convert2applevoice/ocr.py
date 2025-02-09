@@ -14,21 +14,45 @@ class OCRExtractor:
         self.request.setRecognitionLevel_(1)  # Accurate
         self.request.setUsesLanguageCorrection_(True)
         self.request.setRecognitionLanguages_(["en"])
+        
+        # Get the main display once
+        self.main_display = Quartz.CGMainDisplayID()
+        
+        # Default capture region - can be adjusted via config
+        self.region = {
+            'x': 100,      # Starting x coordinate
+            'y': 300,      # Starting y coordinate (adjusted for phrase area)
+            'width': 800,  # Width of capture
+            'height': 100  # Height of capture
+        }
+
+    def set_capture_region(self, x: int, y: int, width: int, height: int):
+        """Update the screen region to capture.
+        
+        Args:
+            x: Starting x coordinate
+            y: Starting y coordinate
+            width: Width of region to capture
+            height: Height of region to capture
+        """
+        self.region = {
+            'x': x,
+            'y': y,
+            'width': width,
+            'height': height
+        }
 
     def _capture_screen_region(self):
         """Capture the region of screen containing the prompt text."""
-        # Get the main display
-        main_display = Quartz.CGMainDisplayID()
-        
-        # For now, capture a fixed region - this should be made configurable
-        # TODO: Make this region configurable or detect automatically
-        x, y = 100, 100  # Starting coordinates
-        width, height = 800, 100  # Size of region to capture
-        
         # Capture the screen region
         image = Quartz.CGDisplayCreateImageForRect(
-            main_display,
-            Quartz.CGRectMake(x, y, width, height)
+            self.main_display,
+            Quartz.CGRectMake(
+                self.region['x'],
+                self.region['y'],
+                self.region['width'],
+                self.region['height']
+            )
         )
         
         return image

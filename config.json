@@ -1,0 +1,21 @@
+{
+    "tts_engine": "azure",
+    "tts_rate": 175,
+    "tts_volume": 1.0,
+    "tts_pitch": 1.0,
+    "audio": {
+        "output_device": "BlackHole 2ch",
+        "enable_monitoring": true,
+        "monitoring_device": null
+    },
+    "tts_extra_options": {
+        "engine_type": "azure",
+        "voice": "en-GB-SoniaNeural",
+        "style": "General"
+    },
+    "check_interval": 0.5,
+    "retry_delay": 1.0,
+    "ocr": {
+        "region": null
+    }
+}
