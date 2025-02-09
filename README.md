@@ -1,5 +1,9 @@
 # Convert2ApplePVoice
 
+
+**Warning: I'm not going to pretend here - if you use this it may break licence terms with TTS systems. Not with Apple - but any other provider. So why have we made this? Because we had to. Simply if a person voice banked with one provider and the provider didnt provide a apple Synth Engine (most of them apart from cereproc) then a client is forced to use software which they cant access to have access to their voice. So this way we make a Apple Personal Voice and all AAC apps have can then play this voice.. Well, thats the idea. Your mileage may vary**
+
+
 A macOS automation tool that facilitates the creation of Apple Personal Voice using TTS output from another system. This tool automates the Personal Voice training process by extracting text via OCR and playing it back using TTS.
 
 ## Features
