@@ -3,13 +3,17 @@
 from pathlib import Path
 import Quartz
 from Vision import VNRecognizeTextRequest, VNImageRequestHandler
-from AppKit import NSBitmapImageRep
+from AppKit import NSBitmapImageRep, NSWorkspace
 
 class OCRExtractor:
     """Handles OCR text extraction using Apple's Vision framework."""
 
-    def __init__(self):
-        """Initialize the OCR extractor."""
+    def __init__(self, region=None):
+        """Initialize the OCR extractor.
+        
+        Args:
+            region: Optional dict with x, y, width, height for capture region
+        """
         self.request = VNRecognizeTextRequest.alloc().init()
         self.request.setRecognitionLevel_(1)  # Accurate
         self.request.setUsesLanguageCorrection_(True)
@@ -19,7 +23,7 @@ class OCRExtractor:
         self.main_display = Quartz.CGMainDisplayID()
         
         # Default capture region - can be adjusted via config
-        self.region = {
+        self.region = region or {
             'x': 100,      # Starting x coordinate
             'y': 300,      # Starting y coordinate (adjusted for phrase area)
             'width': 800,  # Width of capture
@@ -42,8 +46,26 @@ class OCRExtractor:
             'height': height
         }
 
+    def _is_personal_voice_focused(self) -> bool:
+        """Check if Personal Voice app is the frontmost window.
+        
+        Returns:
+            bool: True if Personal Voice is focused, False otherwise
+        """
+        workspace = NSWorkspace.sharedWorkspace()
+        active_app = workspace.frontmostApplication()
+        if not active_app:
+            return False
+            
+        app_name = active_app.localizedName()
+        return app_name == "PersonalVoice" or app_name == "Personal Voice"
+
     def _capture_screen_region(self):
         """Capture the region of screen containing the prompt text."""
+        # Only capture if Personal Voice is focused
+        if not self._is_personal_voice_focused():
+            return None
+            
         # Capture the screen region
         image = Quartz.CGDisplayCreateImageForRect(
             self.main_display,

@@ -17,7 +17,7 @@ def main():
     """Main automation loop for Personal Voice creation."""
     try:
         config = Config()
-        ocr = OCRExtractor()
+        ocr = OCRExtractor(region=config.ocr.get('region'))
         
         # Create TTS engine with config
         tts_config = TTSConfig(
@@ -35,17 +35,26 @@ def main():
 
         console.print("[bold green]Starting Personal Voice automation...[/bold green]")
         console.print("[yellow]Make sure Personal Voice is in Continuous Recording mode[/yellow]")
+        console.print("[yellow]Press Ctrl+C to stop[/yellow]")
         
         last_text = ""
+        waiting_for_focus = False
+        
         while True:
             # Extract text from current prompt
             text = ocr.extract_text()
-            if not text:
-                time.sleep(config.retry_delay)  # Wait before retry
-                continue
-
+            
+            # If text is empty and we weren't previously waiting for focus
+            if not text and not waiting_for_focus:
+                console.print("[yellow]Waiting for Personal Voice window to be focused...[/yellow]")
+                waiting_for_focus = True
+            # If we have text and we were waiting for focus
+            elif text and waiting_for_focus:
+                console.print("[green]Personal Voice window detected![/green]")
+                waiting_for_focus = False
+            
             # Only process if text has changed (new prompt)
-            if text != last_text:
+            if text and text != last_text:
                 console.print(f"[cyan]New phrase detected:[/cyan] {text}")
                 
                 # Play text using TTS

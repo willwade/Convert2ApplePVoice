@@ -3,6 +3,7 @@
     "tts_rate": 175,
     "tts_volume": 1.0,
     "tts_pitch": 1.0,
+    "tts_voice": "en-GB-SoniaNeural",
     "audio": {
         "output_device": "BlackHole 2ch",
         "enable_monitoring": true,
@@ -10,12 +11,20 @@
     },
     "tts_extra_options": {
         "engine_type": "azure",
-        "voice": "en-GB-SoniaNeural",
         "style": "General"
+    },
+    "tts_credentials": {
+        "azure_key": "YOUR_AZURE_KEY",
+        "azure_region": "uksouth"
     },
     "check_interval": 0.5,
     "retry_delay": 1.0,
     "ocr": {
-        "region": null
+        "region": {
+            "x": 300,
+            "y": 720,
+            "width": 700,
+            "height": 100
+        }
     }
 }

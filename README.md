@@ -66,7 +66,6 @@ The tool needs to route TTS audio to Personal Voice's input. Here's how to set i
    - Open System Settings > Sound
    - Set Input to "BlackHole 2ch"
    - Set Output to your regular speakers
-   - In Personal Voice setup, ensure it's using "BlackHole 2ch" as input
 
 3. **Optional: Audio Monitoring**
    To hear the TTS output while it's being recorded:
@@ -77,13 +76,37 @@ The tool needs to route TTS audio to Personal Voice's input. Here's how to set i
      3. Check both your speakers and "BlackHole 2ch"
      4. Use this as your system output to hear the TTS
 
+### (Optional)Switching Audio Input Devices
+
+You can programmatically switch between audio input devices using the `switchaudio-osx` command-line tool:
+
+1. Install the tool:
+```bash
+brew install switchaudio-osx
+```
+
+2. Switch to BlackHole:
+```bash
+SwitchAudioSource -s "BlackHole 2ch" -t input
+```
+
+3. Switch back to built-in microphone:
+```bash
+SwitchAudioSource -s "MacBook Air Microphone" -t input
+```
+
+You can also list all available audio devices:
+```bash
+SwitchAudioSource -a
+```
+
 ## Usage
 
 1. Open Personal Voice setup in System Settings
 2. Enable "Continuous Recording" mode in Personal Voice
 3. Run the automation script:
 ```bash
-uv run src/main.py
+PYTHONPATH=src uv run -m convert2applevoice
 ```
 
 4. The script will:

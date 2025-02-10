@@ -10,9 +10,8 @@ dependencies = [
     "pyobjc-framework-Vision>=9.2",
     "pytest>=7.4.3",
     "rich>=13.7.0",
-    "py3-tts-wrapper[microsoft]>=0.1.0",
+    "py3-tts-wrapper[microsoft,elevenlabs,playht]>=0.1.0",
     "numpy>=1.24.0",
-    "azure-cognitiveservices-speech>=1.31.0",
 ]
 requires-python = ">=3.10"
 
